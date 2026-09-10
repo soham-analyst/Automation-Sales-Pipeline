@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sales-data-pipeline"
+version = "0.1.0"
+description = "Automated Sales Data Pipeline with Ingestion, Validation, Cleaning, Transformation and Reporting"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "openpyxl>=3.1.0",
+    "python-dotenv>=1.0.0",
+    "sqlalchemy>=2.0.0",
+    "pymysql>=1.1.0",
+    "cryptography>=41.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.4.0",
+    "black>=23.0.0",
+    "pip-audit>=2.7.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "env",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]  # line length handled by black/formatter
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312', 'py313']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | env
+  | build
+  | dist
+)/
+'''
+
+[tool.coverage.run]
+source = ["src", "config"]
+omit = [
+    "tests/*",
+    "scripts/*",
+]

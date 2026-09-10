@@ -1,0 +1,3 @@
+-- analysis_queries.sql
+-- Placeholder. Filled in during Part 10 (MySQL Database Design)
+-- and Part 16 (SQL Analysis).
