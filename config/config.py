@@ -10,6 +10,7 @@ from pathlib import Path
 # Try importing dotenv if available
 try:
     from dotenv import load_dotenv
+
     # Base directory is project root (parent of config/)
     BASE_DIR = Path(__file__).resolve().parent.parent
     load_dotenv(BASE_DIR / ".env")
@@ -36,6 +37,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 # Environment Settings
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
 
 def get_database_url() -> str:
     """Generate SQLAlchemy connection URL for MySQL."""

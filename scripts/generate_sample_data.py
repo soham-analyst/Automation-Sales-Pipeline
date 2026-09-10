@@ -86,12 +86,56 @@ REGION_STATE_CITY = {
 PAYMENT_METHODS = ["Credit Card", "Debit Card", "UPI", "Net Banking", "Cash on Delivery"]
 PAYMENT_WEIGHTS = [0.28, 0.20, 0.32, 0.12, 0.08]
 
-FIRST_NAMES = ["Aarav", "Vivaan", "Aditi", "Diya", "Ishaan", "Kabir", "Meera", "Rohan",
-               "Saanvi", "Ananya", "Arjun", "Kavya", "Neha", "Rahul", "Priya", "Sanya",
-               "Vikram", "Pooja", "Karan", "Riya", "Aryan", "Tanvi", "Manish", "Shreya",
-               "Nikhil", "Divya", "Amit", "Sneha", "Rajesh", "Pallavi"]
-LAST_NAMES = ["Sharma", "Verma", "Patel", "Gupta", "Iyer", "Nair", "Reddy", "Khan",
-              "Singh", "Kumar", "Das", "Mehta", "Joshi", "Chatterjee", "Rao", "Malhotra"]
+FIRST_NAMES = [
+    "Aarav",
+    "Vivaan",
+    "Aditi",
+    "Diya",
+    "Ishaan",
+    "Kabir",
+    "Meera",
+    "Rohan",
+    "Saanvi",
+    "Ananya",
+    "Arjun",
+    "Kavya",
+    "Neha",
+    "Rahul",
+    "Priya",
+    "Sanya",
+    "Vikram",
+    "Pooja",
+    "Karan",
+    "Riya",
+    "Aryan",
+    "Tanvi",
+    "Manish",
+    "Shreya",
+    "Nikhil",
+    "Divya",
+    "Amit",
+    "Sneha",
+    "Rajesh",
+    "Pallavi",
+]
+LAST_NAMES = [
+    "Sharma",
+    "Verma",
+    "Patel",
+    "Gupta",
+    "Iyer",
+    "Nair",
+    "Reddy",
+    "Khan",
+    "Singh",
+    "Kumar",
+    "Das",
+    "Mehta",
+    "Joshi",
+    "Chatterjee",
+    "Rao",
+    "Malhotra",
+]
 
 N_CUSTOMERS = 900
 N_PRODUCTS_PER_SUBCAT = 4
@@ -114,14 +158,16 @@ for category, subcats in CATEGORY_MAP.items():
             unit_price = round(rng.uniform(low, high), 2)
             unit_cost = round(unit_price * rng.uniform(0.55, 0.8), 2)  # cost is 55-80% of price
             pname = f"{subcat[:-1] if subcat.endswith('s') else subcat} Item {pid_counter}"
-            product_pool.append({
-                "Product_ID": pid,
-                "Product_Name": pname,
-                "Category": category,
-                "Sub_Category": subcat,
-                "unit_price": unit_price,
-                "unit_cost": unit_cost,
-            })
+            product_pool.append(
+                {
+                    "Product_ID": pid,
+                    "Product_Name": pname,
+                    "Category": category,
+                    "Sub_Category": subcat,
+                    "unit_price": unit_price,
+                    "unit_cost": unit_cost,
+                }
+            )
             pid_counter += 1
 product_df = pd.DataFrame(product_pool)
 
@@ -172,25 +218,27 @@ def make_month_data(month_name: str, month_num: int, year: int, n_rows: int, ord
 
         payment_method = rng.choice(PAYMENT_METHODS, p=PAYMENT_WEIGHTS)
 
-        rows.append({
-            "Order_ID": f"ORD{order_id:07d}",
-            "Order_Date": order_date,
-            "Customer_ID": cust_id,
-            "Customer_Name": cust_name,
-            "Product_ID": product["Product_ID"],
-            "Product_Name": product["Product_Name"],
-            "Category": product["Category"],
-            "Sub_Category": product["Sub_Category"],
-            "Region": region,
-            "State": state,
-            "City": city,
-            "Sales": sales,
-            "Quantity": quantity,
-            "Discount": discount_pct,
-            "Cost": cost,
-            "Profit": profit,
-            "Payment_Method": payment_method,
-        })
+        rows.append(
+            {
+                "Order_ID": f"ORD{order_id:07d}",
+                "Order_Date": order_date,
+                "Customer_ID": cust_id,
+                "Customer_Name": cust_name,
+                "Product_ID": product["Product_ID"],
+                "Product_Name": product["Product_Name"],
+                "Category": product["Category"],
+                "Sub_Category": product["Sub_Category"],
+                "Region": region,
+                "State": state,
+                "City": city,
+                "Sales": sales,
+                "Quantity": quantity,
+                "Discount": discount_pct,
+                "Cost": cost,
+                "Profit": profit,
+                "Payment_Method": payment_method,
+            }
+        )
 
     return pd.DataFrame(rows)
 

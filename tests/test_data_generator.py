@@ -6,7 +6,6 @@ Compatible with both pytest and standard unittest.
 
 import csv
 import unittest
-from pathlib import Path
 from scripts import generate_sample_data
 from config import config
 
@@ -29,6 +28,7 @@ EXPECTED_COLUMNS = {
     "Profit",
     "Payment_Method",
 }
+
 
 class TestDataGenerator(unittest.TestCase):
     def test_generator_constants(self):
@@ -55,7 +55,7 @@ class TestDataGenerator(unittest.TestCase):
         """Verify that generated CSV files contain expected columns."""
         csv_files = list(config.RAW_DATA_DIR.glob("*.csv"))
         self.assertGreater(len(csv_files), 0, "No CSV files found in data/raw")
-        
+
         for csv_file in csv_files:
             with open(csv_file, mode="r", encoding="utf-8", errors="replace") as f:
                 reader = csv.reader(f)
@@ -63,6 +63,7 @@ class TestDataGenerator(unittest.TestCase):
                 header_set = set(headers)
                 missing = EXPECTED_COLUMNS - header_set
                 self.assertFalse(missing, f"{csv_file.name} is missing expected columns: {missing}")
+
 
 if __name__ == "__main__":
     unittest.main()
