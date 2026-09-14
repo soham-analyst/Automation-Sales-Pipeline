@@ -1,107 +1,68 @@
-"""
-main.py
-CLI Entry Point for the Automated Sales Data Pipeline.
-Wires Ingestion -> Validation -> Cleaning -> Transformation -> Reporting.
+"""main.py
 
-Usage:
-    python main.py
-    python main.py --raw-dir data/raw --export-dir data/processed
+Entry point: python -m main
+Wires ingestion -> cleaning -> transformation -> outlier detection -> database load.
 """
 
-import argparse
-import sys
-from pathlib import Path
-from src.pipeline import run_pipeline
+import logging
+
+from config.database import engine
+from src.cleaning import clean_data
+from src.data_quality_report import generate_data_quality_report
+from src.ingestion import run_ingestion
+from src.loader import load_to_db
+from src.outliers import detect_outliers
+from src.transformation import transform_sales_data
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description="Automated Sales Data Engineering Pipeline",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "--raw-dir",
-        type=str,
-        default=None,
-        help="Path to raw source files (.csv, .xlsx)",
-    )
-    parser.add_argument(
-        "--export-dir",
-        type=str,
-        default=None,
-        help="Path to processed output directory",
-    )
-    parser.add_argument(
-        "--rejected-dir",
-        type=str,
-        default=None,
-        help="Path to quarantined rejected records directory",
-    )
-    return parser.parse_args()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
-def print_banner():
-    print("""
-========================================================================
-             AUTOMATED SALES DATA PIPELINE (ETL RUNNER)
-========================================================================
-    """)
+def run_pipeline():
+    logging.info("Starting Sales Data Pipeline...")
 
+    # Step 1: Automated Ingestion
+    df_raw = run_ingestion()
 
-def print_summary(summary: dict):
-    metrics = summary.get("pipeline_metrics", {})
-    kpis = summary.get("kpis", {})
-    print(f"""
-------------------------------------------------------------------------
-Pipeline Execution Summary:
-------------------------------------------------------------------------
-  Status:                   {summary.get('status')}
-  Execution Time:           {summary.get('duration_seconds')}s
-  Raw Records Ingested:     {metrics.get('raw_records_ingested', 0):,}
-  Validation Passed:        {metrics.get('records_passed_validation', 0):,}
-  Records Quarantined:      {metrics.get('records_rejected', 0):,}
-  Duplicates Dropped:       {metrics.get('duplicate_records_removed', 0):,}
-  Final Clean Records:      {metrics.get('final_processed_records', 0):,}
+    if df_raw.empty:
+        logging.warning("No data found to process. Exiting pipeline.")
+        return
 
-Key Business Performance Metrics:
-------------------------------------------------------------------------
-  Total Revenue:            INR {kpis.get('total_sales', 0):,.2f}
-  Total Profit:             INR {kpis.get('total_profit', 0):,.2f}
-  Overall Profit Margin:    {kpis.get('overall_margin_pct', 0)}%
-  Average Order Value:      INR {kpis.get('average_order_value', 0):,.2f}
-  Unique Customers:         {kpis.get('unique_customers', 0):,}
-  Unique Products:          {kpis.get('unique_products', 0):,}
-  Flagged Outlier Orders:   {kpis.get('outlier_count', 0):,}
-
-Output Files:
-------------------------------------------------------------------------
-  Transformed Data:         {summary.get('artifacts', {}).get('processed_file')}
-  Quarantine Logs:          {summary.get('artifacts', {}).get('rejected_directory')}
-========================================================================
-    """)
-
-
-def main():
-    print_banner()
-    args = parse_arguments()
-
-    raw_dir = Path(args.raw_dir) if args.raw_dir else None
-    export_dir = Path(args.export_dir) if args.export_dir else None
-    rejected_dir = Path(args.rejected_dir) if args.rejected_dir else None
-
-    result = run_pipeline(
-        raw_dir=raw_dir,
-        processed_dir=export_dir,
-        rejected_dir=rejected_dir,
+    # Step 2: Data Cleaning
+    df_clean = clean_data(df_raw)
+    current_rejected_rows = getattr(clean_data, "last_rejected_count", 0)
+    current_rejected_rows = getattr(
+        clean_data,
+        "last_rejected_count",
+        0,
     )
 
-    if result.get("status") == "SUCCESS":
-        print_summary(result)
-        sys.exit(0)
-    else:
-        print(f"[ERROR] Pipeline execution failed: {result.get('error')}")
-        sys.exit(1)
+    # Step 3: Transformation & Feature Engineering
+    df_transformed = transform_sales_data(df_clean)
+
+    # Step 4: Outlier Detection
+    df_final = detect_outliers(df_transformed)
+
+    # Step 5: Load to SQL Server
+    load_summary = load_to_db(df_final, engine)
+
+    logging.info("Rows inserted this run: %s", load_summary)
+
+    # Step 6: Generate Data-Quality Report
+    report_path = generate_data_quality_report(
+        raw_df=df_raw,
+        clean_df=df_clean,
+        final_df=df_final,
+        load_summary=load_summary,
+        current_rejected_rows=current_rejected_rows,
+    )
+
+    logging.info("Data-quality report saved to: %s", report_path)
+    logging.info("Pipeline executed successfully!")
 
 
 if __name__ == "__main__":
-    main()
+    run_pipeline()
