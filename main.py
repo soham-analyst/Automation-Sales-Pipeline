@@ -14,7 +14,6 @@ from src.loader import load_to_db
 from src.outliers import detect_outliers
 from src.transformation import transform_sales_data
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",

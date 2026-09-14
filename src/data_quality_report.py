@@ -6,12 +6,7 @@ import json
 
 import pandas as pd
 
-
-REPORTS_DIR = (
-    Path(__file__).resolve().parent.parent
-    / "data"
-    / "reports"
-)
+REPORTS_DIR = Path(__file__).resolve().parent.parent / "data" / "reports"
 
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -34,15 +29,11 @@ def generate_data_quality_report(
         "Outlier_Flag",
     ):
         if column in final_df.columns:
-            outlier_count = int(
-                final_df[column].fillna(False).astype(bool).sum()
-            )
+            outlier_count = int(final_df[column].fillna(False).astype(bool).sum())
             break
 
     report = {
-        "report_generated_at": datetime.now().isoformat(
-            timespec="seconds"
-        ),
+        "report_generated_at": datetime.now().isoformat(timespec="seconds"),
         "pipeline_summary": {
             "raw_rows": int(len(raw_df)),
             "clean_rows": int(len(clean_df)),
@@ -50,20 +41,13 @@ def generate_data_quality_report(
             "rejected_rows_current_run": int(current_rejected_rows),
             "outlier_rows": int(outlier_count),
         },
-        "database_load_summary": {
-            key: int(value)
-            for key, value in load_summary.items()
-        },
+        "database_load_summary": {key: int(value) for key, value in load_summary.items()},
         "quality_checks": {
             "raw_data_available": not raw_df.empty,
             "clean_data_available": not clean_df.empty,
             "final_data_available": not final_df.empty,
-            "null_values_in_final_data": int(
-                final_df.isna().sum().sum()
-            ),
-            "duplicate_rows_in_final_data": int(
-                final_df.duplicated().sum()
-            ),
+            "null_values_in_final_data": int(final_df.isna().sum().sum()),
+            "duplicate_rows_in_final_data": int(final_df.duplicated().sum()),
         },
     }
 

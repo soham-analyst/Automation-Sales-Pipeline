@@ -22,8 +22,10 @@ from config.config import get_connection_string, get_db_config
 
 def main():
     cfg = get_db_config()
-    print(f"Connecting to MySQL at {cfg['DB_HOST']}:{cfg['DB_PORT']}/{cfg['DB_NAME']} "
-          f"as user '{cfg['DB_USER']}' ...")
+    print(
+        f"Connecting to MySQL at {cfg['DB_HOST']}:{cfg['DB_PORT']}/{cfg['DB_NAME']} "
+        f"as user '{cfg['DB_USER']}' ..."
+    )
 
     engine = create_engine(get_connection_string())
 

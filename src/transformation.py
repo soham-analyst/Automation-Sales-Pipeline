@@ -25,7 +25,6 @@ import logging
 import numpy as np
 import pandas as pd
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -78,9 +77,7 @@ def transform_sales_data(df: pd.DataFrame) -> pd.DataFrame:
     # 2. Recompute Profit
     # ------------------------------------------------------------------
     if {"Sales", "Cost"}.issubset(df.columns):
-        df["Profit"] = (
-            df["Sales"] - df["Cost"]
-        ).round(2)
+        df["Profit"] = (df["Sales"] - df["Cost"]).round(2)
 
     # ------------------------------------------------------------------
     # 3. Calculate Unit_Price
@@ -88,9 +85,7 @@ def transform_sales_data(df: pd.DataFrame) -> pd.DataFrame:
     if {"Sales", "Quantity"}.issubset(df.columns):
         safe_quantity = df["Quantity"].replace(0, np.nan)
 
-        df["Unit_Price"] = (
-            df["Sales"] / safe_quantity
-        ).round(2)
+        df["Unit_Price"] = (df["Sales"] / safe_quantity).round(2)
 
     # ------------------------------------------------------------------
     # 4. Calculate Profit_Margin
@@ -106,34 +101,22 @@ def transform_sales_data(df: pd.DataFrame) -> pd.DataFrame:
     # 5. Calculate Gross_Revenue
     # ------------------------------------------------------------------
     if {"Sales", "Discount"}.issubset(df.columns):
-        safe_discount_factor = (
-            1 - df["Discount"]
-        ).replace(0, np.nan)
+        safe_discount_factor = (1 - df["Discount"]).replace(0, np.nan)
 
-        df["Gross_Revenue"] = (
-            df["Sales"] / safe_discount_factor
-        ).round(2)
+        df["Gross_Revenue"] = (df["Sales"] / safe_discount_factor).round(2)
 
         # If Discount is 100%, avoid leaving Gross_Revenue as NaN.
-        df["Gross_Revenue"] = df["Gross_Revenue"].fillna(
-            df["Sales"]
-        )
+        df["Gross_Revenue"] = df["Gross_Revenue"].fillna(df["Sales"])
 
     # ------------------------------------------------------------------
     # 6. Add date-based columns
     # ------------------------------------------------------------------
     if "Order_Date" in df.columns:
-        df["Order_Year"] = (
-            df["Order_Date"].dt.year.astype("Int64")
-        )
+        df["Order_Year"] = df["Order_Date"].dt.year.astype("Int64")
 
-        df["Order_Month"] = (
-            df["Order_Date"].dt.month.astype("Int64")
-        )
+        df["Order_Month"] = df["Order_Date"].dt.month.astype("Int64")
 
-        df["Order_YearMonth"] = (
-            df["Order_Date"].dt.strftime("%Y-%m")
-        )
+        df["Order_YearMonth"] = df["Order_Date"].dt.strftime("%Y-%m")
 
     # ------------------------------------------------------------------
     # Logging

@@ -14,7 +14,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -23,10 +22,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------
 
 REJECTED_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "data"
-    / "rejected"
-    / "rejected_records.csv"
+    Path(__file__).resolve().parent.parent / "data" / "rejected" / "rejected_records.csv"
 )
 
 # Canonical date format
@@ -34,11 +30,11 @@ _ISO_DATE = "%Y-%m-%d"
 
 # Recognized date formats
 _DATE_FORMATS = [
-    "%Y-%m-%d",      # 2025-01-14
-    "%d/%m/%Y",      # 14/01/2025
-    "%m-%d-%Y",      # 01-14-2025
-    "%d-%b-%Y",      # 14-Jan-2025
-    "%d %B %Y",      # 14 January 2025
+    "%Y-%m-%d",  # 2025-01-14
+    "%d/%m/%Y",  # 14/01/2025
+    "%m-%d-%Y",  # 01-14-2025
+    "%d-%b-%Y",  # 14-Jan-2025
+    "%d %B %Y",  # 14 January 2025
 ]
 
 # Word-number mapping for Quantity values
@@ -59,17 +55,13 @@ _WORD_NUMBERS = {
 CATEGORY_MAP = {
     "electronics": "Electronics",
     "electronic": "Electronics",
-
     "furniture": "Furniture",
     "furnitures": "Furniture",
-
     "clothing": "Clothing",
     "cloths": "Clothing",
     "apparel": "Clothing",
-
     "grocery": "Groceries",
     "groceries": "Groceries",
-
     "office supplies": "Office Supplies",
     "office-supplies": "Office Supplies",
     "officesupplies": "Office Supplies",
@@ -79,6 +71,7 @@ CATEGORY_MAP = {
 # ---------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------
+
 
 def _parse_date(value) -> str | None:
     """
@@ -145,6 +138,7 @@ def _coerce_quantity(value) -> int | None:
 # Main cleaning function
 # ---------------------------------------------------------------------
 
+
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean and validate the input DataFrame.
@@ -203,26 +197,17 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
         # Normalize values before mapping:
         # " ELECTRONICS " -> "electronics"
-        category_keys = (
-            df["Category"]
-            .astype("string")
-            .str.strip()
-            .str.lower()
-        )
+        category_keys = df["Category"].astype("string").str.strip().str.lower()
 
         # Apply the canonical category mapping
         mapped_categories = category_keys.map(CATEGORY_MAP)
 
         # Identify values not found in the mapping
-        unmapped = (
-            mapped_categories.isna()
-            & df["Category"].notna()
-        )
+        unmapped = mapped_categories.isna() & df["Category"].notna()
 
         if unmapped.any():
             logger.warning(
-                "Category value(s) not in CATEGORY_MAP, "
-                "title-cased as fallback: %s",
+                "Category value(s) not in CATEGORY_MAP, " "title-cased as fallback: %s",
                 sorted(
                     df.loc[
                         unmapped,
@@ -235,16 +220,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
         # Use mapped values where available.
         # Otherwise, use a title-cased fallback.
-        fallback_categories = (
-            df["Category"]
-            .astype("string")
-            .str.strip()
-            .str.title()
-        )
+        fallback_categories = df["Category"].astype("string").str.strip().str.title()
 
-        df["Category"] = mapped_categories.fillna(
-            fallback_categories
-        )
+        df["Category"] = mapped_categories.fillna(fallback_categories)
 
     # -----------------------------------------------------------------
     # 4. Coerce Quantity and quarantine invalid values
@@ -252,28 +230,17 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     if "Quantity" in df.columns:
 
-        df["Quantity"] = df["Quantity"].apply(
-            _coerce_quantity
-        )
+        df["Quantity"] = df["Quantity"].apply(_coerce_quantity)
 
-        bad_quantity = (
-            df["Quantity"].isna()
-            | (df["Quantity"] <= 0)
-        )
+        bad_quantity = df["Quantity"].isna() | (df["Quantity"] <= 0)
 
         if bad_quantity.any():
 
-            rejected_quantity = df.loc[
-                bad_quantity
-            ].copy()
+            rejected_quantity = df.loc[bad_quantity].copy()
 
-            rejected_quantity["rejection_reason"] = (
-                "Invalid Quantity"
-            )
+            rejected_quantity["rejection_reason"] = "Invalid Quantity"
 
-            rejected_frames.append(
-                rejected_quantity
-            )
+            rejected_frames.append(rejected_quantity)
 
             logger.warning(
                 "Quarantining %d row(s): invalid Quantity",
@@ -281,9 +248,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             )
 
         # Keep only valid Quantity records
-        df = df.loc[
-            ~bad_quantity
-        ].copy()
+        df = df.loc[~bad_quantity].copy()
 
         df["Quantity"] = df["Quantity"].astype(int)
 
@@ -305,24 +270,15 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     if "Sales" in df.columns:
 
-        bad_sales = (
-            df["Sales"].isna()
-            | (df["Sales"] <= 0)
-        )
+        bad_sales = df["Sales"].isna() | (df["Sales"] <= 0)
 
         if bad_sales.any():
 
-            rejected_sales = df.loc[
-                bad_sales
-            ].copy()
+            rejected_sales = df.loc[bad_sales].copy()
 
-            rejected_sales["rejection_reason"] = (
-                "Invalid Sales"
-            )
+            rejected_sales["rejection_reason"] = "Invalid Sales"
 
-            rejected_frames.append(
-                rejected_sales
-            )
+            rejected_frames.append(rejected_sales)
 
             logger.warning(
                 "Quarantining %d row(s): invalid Sales",
@@ -330,9 +286,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             )
 
         # Keep only valid Sales records
-        df = df.loc[
-            ~bad_sales
-        ].copy()
+        df = df.loc[~bad_sales].copy()
 
     # -----------------------------------------------------------------
     # 7. Fill missing Discount values
@@ -364,51 +318,37 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     if critical_columns:
 
-        missing_values = df[
-            critical_columns
-        ].isna()
+        missing_values = df[critical_columns].isna()
 
         bad_critical = missing_values.any(axis=1)
 
         if bad_critical.any():
 
-            rejected_critical = df.loc[
-                bad_critical
-            ].copy()
+            rejected_critical = df.loc[bad_critical].copy()
 
             rejected_critical["rejection_reason"] = [
                 "Missing "
                 + ", ".join(
-                    column
-                    for column in critical_columns
-                    if missing_values.loc[index, column]
+                    column for column in critical_columns if missing_values.loc[index, column]
                 )
                 for index in rejected_critical.index
             ]
 
-            rejected_frames.append(
-                rejected_critical
-            )
+            rejected_frames.append(rejected_critical)
 
             logger.warning(
-                "Quarantining %d row(s): "
-                "missing critical field(s)",
+                "Quarantining %d row(s): " "missing critical field(s)",
                 bad_critical.sum(),
             )
 
         # Keep only rows with all critical fields present
-        df = df.loc[
-            ~bad_critical
-        ].copy()
+        df = df.loc[~bad_critical].copy()
 
     # -----------------------------------------------------------------
     # 9. Save rejected records
     # -----------------------------------------------------------------
 
-    current_rejected_count = sum(
-        len(frame)
-        for frame in rejected_frames
-    )
+    current_rejected_count = sum(len(frame) for frame in rejected_frames)
 
     if rejected_frames:
 
@@ -447,8 +387,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Make the current rejection count available to main.py
-    clean_data.last_rejected_count = (
-        current_rejected_count
-    )
+    clean_data.last_rejected_count = current_rejected_count
 
     return df.reset_index(drop=True)

@@ -61,8 +61,15 @@ def detect_outliers(df: pd.DataFrame, cols: list[str] = NUMERIC_COLS) -> pd.Data
             df.loc[flagged_idx, "is_outlier"] = True
 
             if category is not None and mask.sum():
-                logger.info("Outliers in '%s' within category '%s': %d row(s)", col, category, mask.sum())
+                logger.info(
+                    "Outliers in '%s' within category '%s': %d row(s)", col, category, mask.sum()
+                )
 
     total = df["is_outlier"].sum()
-    logger.info("Total outlier rows flagged: %d / %d (%.1f%%)", total, len(df), 100 * total / max(len(df), 1))
+    logger.info(
+        "Total outlier rows flagged: %d / %d (%.1f%%)",
+        total,
+        len(df),
+        100 * total / max(len(df), 1),
+    )
     return df

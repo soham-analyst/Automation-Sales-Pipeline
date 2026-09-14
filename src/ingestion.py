@@ -35,25 +35,59 @@ SUPPORTED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 # separators) seen across real-world exports onto our canonical schema.
 # Extend this dict as new source systems get added to the pipeline.
 COLUMN_RENAME_MAP = {
-    "order id": "Order_ID", "orderid": "Order_ID", "order_id": "Order_ID",
-    "order date": "Order_Date", "orderdate": "Order_Date", "order_date": "Order_Date",
-    "customer id": "Customer_ID", "customerid": "Customer_ID", "customer_id": "Customer_ID",
-    "customer name": "Customer_Name", "customername": "Customer_Name", "customer_name": "Customer_Name",
-    "product id": "Product_ID", "productid": "Product_ID", "product_id": "Product_ID",
-    "product name": "Product_Name", "productname": "Product_Name", "product_name": "Product_Name",
+    "order id": "Order_ID",
+    "orderid": "Order_ID",
+    "order_id": "Order_ID",
+    "order date": "Order_Date",
+    "orderdate": "Order_Date",
+    "order_date": "Order_Date",
+    "customer id": "Customer_ID",
+    "customerid": "Customer_ID",
+    "customer_id": "Customer_ID",
+    "customer name": "Customer_Name",
+    "customername": "Customer_Name",
+    "customer_name": "Customer_Name",
+    "product id": "Product_ID",
+    "productid": "Product_ID",
+    "product_id": "Product_ID",
+    "product name": "Product_Name",
+    "productname": "Product_Name",
+    "product_name": "Product_Name",
     "category": "Category",
-    "sub category": "Sub_Category", "subcategory": "Sub_Category", "sub_category": "Sub_Category",
-    "region": "Region", "state": "State", "city": "City",
-    "sales": "Sales", "quantity": "Quantity", "discount": "Discount",
-    "cost": "Cost", "profit": "Profit",
-    "payment method": "Payment_Method", "paymentmethod": "Payment_Method", "payment_method": "Payment_Method",
+    "sub category": "Sub_Category",
+    "subcategory": "Sub_Category",
+    "sub_category": "Sub_Category",
+    "region": "Region",
+    "state": "State",
+    "city": "City",
+    "sales": "Sales",
+    "quantity": "Quantity",
+    "discount": "Discount",
+    "cost": "Cost",
+    "profit": "Profit",
+    "payment method": "Payment_Method",
+    "paymentmethod": "Payment_Method",
+    "payment_method": "Payment_Method",
 }
 
 REQUIRED_COLUMNS = [
-    "Order_ID", "Order_Date", "Customer_ID", "Customer_Name",
-    "Product_ID", "Product_Name", "Category", "Sub_Category",
-    "Region", "State", "City", "Sales", "Quantity", "Discount",
-    "Cost", "Profit", "Payment_Method",
+    "Order_ID",
+    "Order_Date",
+    "Customer_ID",
+    "Customer_Name",
+    "Product_ID",
+    "Product_Name",
+    "Category",
+    "Sub_Category",
+    "Region",
+    "State",
+    "City",
+    "Sales",
+    "Quantity",
+    "Discount",
+    "Cost",
+    "Profit",
+    "Payment_Method",
 ]
 
 
@@ -66,10 +100,9 @@ def discover_files(raw_dir: Path = RAW_DATA_DIR) -> list:
         raise FileNotFoundError(f"Raw data folder not found: {raw_dir}")
 
     files = sorted(
-        p for p in raw_dir.iterdir()
-        if p.is_file()
-        and p.suffix.lower() in SUPPORTED_EXTENSIONS
-        and not p.name.startswith("~$")
+        p
+        for p in raw_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in SUPPORTED_EXTENSIONS and not p.name.startswith("~$")
     )
     logger.info("Discovered %d file(s) in %s", len(files), raw_dir)
     return files
@@ -189,7 +222,6 @@ def load_raw_data(file_path: str) -> pd.DataFrame:
     df = standardize_columns(df)
     df = add_metadata(df, path.name)
     return df
-
 
 
 if __name__ == "__main__":

@@ -8,7 +8,6 @@ Full line-by-line explanation arrives in Part 6 (Data Validation).
 """
 
 import logging
-from pathlib import Path
 
 import pandas as pd
 
@@ -59,13 +58,13 @@ def validate_records(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     valid_idx = [i for i, r in reasons.items() if not r]
 
     rejected_df = df.loc[rejected_idx].copy()
-    rejected_df["rejection_reason"] = [
-        " | ".join(reasons[i]) for i in rejected_idx
-    ]
+    rejected_df["rejection_reason"] = [" | ".join(reasons[i]) for i in rejected_idx]
     valid_df = df.loc[valid_idx].copy()
 
     logger.info(
         "Validation: %d valid, %d rejected (of %d total)",
-        len(valid_df), len(rejected_df), len(df),
+        len(valid_df),
+        len(rejected_df),
+        len(df),
     )
     return valid_df, rejected_df

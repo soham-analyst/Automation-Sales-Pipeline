@@ -1,5 +1,3 @@
-import pandas as pd
-
 from src.ingestion import ingest_data
 from src.cleaning import clean_data
 from src.transformation import transform_data
@@ -25,9 +23,8 @@ for column in text_columns:
     print(f"\n--- {column} ---")
     print("Maximum length:", values.str.len().max())
 
-    longest = (
-        df.loc[values.str.len().nlargest(10).index, [column]]
-        .assign(_length=values.loc[values.str.len().nlargest(10).index].values)
+    longest = df.loc[values.str.len().nlargest(10).index, [column]].assign(
+        _length=values.loc[values.str.len().nlargest(10).index].values
     )
 
     print(longest.to_string(index=False))

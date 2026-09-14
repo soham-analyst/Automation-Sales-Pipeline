@@ -32,9 +32,7 @@ def get_existing_keys(
         )
         return set()
 
-    query = text(
-        f"SELECT DISTINCT [{key_column}] FROM [{table_name}]"
-    )
+    query = text(f"SELECT DISTINCT [{key_column}] FROM [{table_name}]")
 
     with engine.connect() as conn:
         result = conn.execute(query)
@@ -60,14 +58,11 @@ def insert_new_rows(
         key_column,
     )
 
-    new_rows = df.loc[
-        ~df[key_column].isin(existing)
-    ].copy()
+    new_rows = df.loc[~df[key_column].isin(existing)].copy()
 
     if new_rows.empty:
         logger.info(
-            "No new rows for '%s' - already up to date "
-            "(%d candidate rows, 0 new).",
+            "No new rows for '%s' - already up to date " "(%d candidate rows, 0 new).",
             table_name,
             len(df),
         )

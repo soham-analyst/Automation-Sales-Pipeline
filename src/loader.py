@@ -18,7 +18,6 @@ from sqlalchemy.engine import Engine
 
 from src.database import insert_new_rows
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -175,17 +174,13 @@ def _validate_fact_sales(fact_df: pd.DataFrame) -> pd.DataFrame:
         errors="coerce",
     )
 
-    invalid_sales = (
-        sales_numeric.isna()
-        | (sales_numeric <= 0)
-    )
+    invalid_sales = sales_numeric.isna() | (sales_numeric <= 0)
 
     invalid_count = int(invalid_sales.sum())
 
     if invalid_count > 0:
         logger.error(
-            "%d row(s) have invalid Sales values and will be excluded "
-            "from the fact_sales load.",
+            "%d row(s) have invalid Sales values and will be excluded " "from the fact_sales load.",
             invalid_count,
         )
 
@@ -222,9 +217,7 @@ def load_to_db(
     """
 
     if df.empty:
-        logger.warning(
-            "load_to_db called with an empty DataFrame - nothing to load."
-        )
+        logger.warning("load_to_db called with an empty DataFrame - nothing to load.")
 
         return {
             "dim_customer": 0,
@@ -261,8 +254,7 @@ def load_to_db(
 
     if unmapped.any():
         logger.error(
-            "%d row(s) failed to map to a Region_Key - dropping them "
-            "from this load.",
+            "%d row(s) failed to map to a Region_Key - dropping them " "from this load.",
             unmapped.sum(),
         )
 
@@ -295,9 +287,7 @@ def load_to_db(
         None,
     )
 
-    fact_df["Ingestion_Timestamp"] = fact_df[
-        "Ingestion_Timestamp"
-    ].where(
+    fact_df["Ingestion_Timestamp"] = fact_df["Ingestion_Timestamp"].where(
         fact_df["Ingestion_Timestamp"].notna(),
         None,
     )
@@ -331,9 +321,7 @@ def load_to_db(
     fact_df = _validate_fact_sales(fact_df)
 
     if fact_df.empty:
-        logger.warning(
-            "No valid fact_sales rows remain after validation."
-        )
+        logger.warning("No valid fact_sales rows remain after validation.")
 
         summary["fact_sales"] = 0
 
@@ -368,11 +356,7 @@ def load_to_db(
     )
 
     if fact_df["Ingestion_Timestamp"].notna().any():
-        timestamp_sample = (
-            fact_df["Ingestion_Timestamp"]
-            .dropna()
-            .iloc[0]
-        )
+        timestamp_sample = fact_df["Ingestion_Timestamp"].dropna().iloc[0]
 
         logger.info(
             "Ingestion_Timestamp Python type: %s",

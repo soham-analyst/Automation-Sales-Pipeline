@@ -117,11 +117,7 @@ class TestSmoke(unittest.TestCase):
     def test_documentation_and_sql_files_exist(self):
         """Verify documentation and SQL schema files exist."""
 
-        data_dict = (
-            config.PROJECT_ROOT
-            / "docs"
-            / "data_dictionary.md"
-        )
+        data_dict = config.PROJECT_ROOT / "docs" / "data_dictionary.md"
 
         self.assertTrue(
             data_dict.exists(),

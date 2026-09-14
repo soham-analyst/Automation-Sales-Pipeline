@@ -52,6 +52,7 @@ DB_PASSWORD = ""
 # Helper functions
 # ---------------------------------------------------------------------------
 
+
 def get_db_config() -> dict:
     """Return a dict of all resolved DB settings."""
     return {
