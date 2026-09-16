@@ -1,0 +1,53 @@
+{
+  "name": "Sales Pipeline Professional",
+  "dataColors": [
+    "#1F6FEB",
+    "#F5A623",
+    "#50C9CE",
+    "#8E7CC3",
+    "#6C7A89",
+    "#2E7D32",
+    "#D1495B",
+    "#495867"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#252423",
+  "tableAccent": "#1F6FEB",
+  "good": "#2E7D32",
+  "neutral": "#F5A623",
+  "bad": "#D1495B",
+  "maximum": "#1F6FEB",
+  "center": "#F5A623",
+  "minimum": "#E8EAED",
+  "null": "#C4C4C4",
+  "textClasses": {
+    "callout": {
+      "fontSize": 32,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#1F6FEB"
+    },
+    "title": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#252423"
+    },
+    "header": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#6C7A89"
+    },
+    "label": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#252423"
+    }
+  },
+  "visualStyles": {
+    "card": {
+      "*": {
+        "labels": [{ "color": { "solid": { "color": "#1F6FEB" } }, "fontSize": 28, "bold": true }],
+        "categoryLabels": [{ "color": { "solid": { "color": "#6C7A89" } }, "fontSize": 11 }]
+      }
+    }
+  }
+}
